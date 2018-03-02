@@ -231,15 +231,43 @@ void Display8() {
 	// OpenGL guarantees that only convex polygons are
 	// drawn correctly.
 
-	glColor3f(1, 0.1, 0.1); // red
+	glColor3f(0.2, 0.15, 0.88);
 	glBegin(GL_POLYGON);
-	glVertex2d(0.5, 0.5);
-	glVertex2d(0.7, 0);
-	glVertex2d(0.5, -0.5);
-	glVertex2d(0, -0.7);
-	glVertex2d(-0.5, -0.5);
-	glVertex2d(0.9, 0.9);
+	glVertex2f(-0.7, 0);
+	glVertex2f(-0.35, 0.7);
+	glVertex2f(0.35, 0.7);
+	glVertex2f(0.7, 0);
+	glVertex2f(0.35, -0.7);
+	glVertex2f(-0.35, -0.7);
+	glVertex2f(-0.5, 0);
+	glVertex2f(-0.25, 0.5);
+	glVertex2f(0.25, 0.5);
+	glVertex2f(0.5, 0);
+	glVertex2f(0.25, -0.5);
+	glVertex2f(-0.25, -0.5);
+	glEnd();
 
+	glColor3f(1, 1, 1);
+	glBegin(GL_POLYGON);
+	glVertex2f(-0.5, 0);
+	glVertex2f(-0.25, 0.5);
+	glVertex2f(0.25, 0.5);
+	glVertex2f(0.5, 0);
+	glVertex2f(0.25, -0.5);
+	glVertex2f(-0.25, -0.5);
+	glEnd();
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glColor3f(1, 0.1, 0.1);
+	glBegin(GL_POLYGON);
+	glVertex2f(-0.5, 0);
+	glVertex2f(-0.25, 0.5);
+	glVertex2f(0.25, 0.5);
+	glVertex2f(0.5, 0);
+	glVertex2f(0.25, -0.5);
+	glVertex2f(-0.25, -0.5);
+	glEnd();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	// add lines of code here
 	glEnd();
 }
