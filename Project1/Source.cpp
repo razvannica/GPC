@@ -141,7 +141,6 @@ void Display3() {
 	glVertex2d(0.5, 0.5);
 	glVertex2d(-0.5, 0.5);
 	glVertex2d(0.5, -0.5);
-	// add lines of code here
 	glEnd();
 }
 
@@ -159,7 +158,6 @@ void Display4() {
 	glVertex2f(1, 0.8);
 	glVertex2f(1, 1);
 
-	// add lines of code here
 	glEnd();
 }
 
@@ -176,7 +174,6 @@ void Display5() {
 	glVertex2f(0.6, 0.6);
 	glVertex2f(1, 0.8);
 	glVertex2f(1, 1);
-	// add lines of code here
 	glEnd();
 }
 
@@ -198,7 +195,6 @@ void Display6() {
 	glVertex2d(-1, -1);
 	glVertex2d(-1, -0.9);
 	glVertex2d(-0.9, -0.9);
-	// add lines of code here
 	glEnd();
 }
 
@@ -218,7 +214,6 @@ void Display7() {
 	glVertex2d(1, 0.4);
 	glVertex2d(0.4, 0.4);
 	glVertex2d(0.3, 0.7);
-	// add lines of code here
 	glEnd();
 }
 
@@ -268,7 +263,6 @@ void Display8() {
 	glVertex2f(-0.25, -0.5);
 	glEnd();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	// add lines of code here
 	glEnd();
 }
 
