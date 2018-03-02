@@ -72,8 +72,6 @@ C:\Windows\System32\glut32.dll
 **********************************/
 #include <GL/glut.h>
 
-// Instead of previous include-file directive use this one.
-//#include <GL/freeglut.h>
 
 // This variable stores the code of the last key
 // of the computer keyboard pressed. This code
@@ -139,6 +137,10 @@ void Display3() {
 
 	glColor3f(1, 0.1, 0.1); // red
 	glBegin(GL_POINTS);
+	glVertex2d(-0.5, -0.5);
+	glVertex2d(0.5, 0.5);
+	glVertex2d(-0.5, 0.5);
+	glVertex2d(0.5, -0.5);
 	// add lines of code here
 	glEnd();
 }
@@ -152,6 +154,11 @@ void Display4() {
 
 	glColor3f(1, 0.1, 0.1); // red
 	glBegin(GL_LINE_STRIP);
+	glVertex2f(0.6, 0.4);
+	glVertex2f(0.6, 0.6);
+	glVertex2f(1, 0.8);
+	glVertex2f(1, 1);
+
 	// add lines of code here
 	glEnd();
 }
@@ -165,6 +172,10 @@ void Display5() {
 
 	glColor3f(1, 0.1, 0.1); // red
 	glBegin(GL_LINE_LOOP);
+	glVertex2f(0.6, 0.4);
+	glVertex2f(0.6, 0.6);
+	glVertex2f(1, 0.8);
+	glVertex2f(1, 1);
 	// add lines of code here
 	glEnd();
 }
@@ -180,6 +191,13 @@ void Display6() {
 
 	glColor3f(1, 0.1, 0.1); // red
 	glBegin(GL_TRIANGLES);
+	glVertex2d(1, 1);
+	glVertex2d(1, 0.9);
+	glVertex2d(0.9, 0.9);
+
+	glVertex2d(-1, -1);
+	glVertex2d(-1, -0.9);
+	glVertex2d(-0.9, -0.9);
 	// add lines of code here
 	glEnd();
 }
@@ -196,6 +214,10 @@ void Display7() {
 
 	glColor3f(1, 0.1, 0.1); // red
 	glBegin(GL_QUADS);
+	glVertex2d(1, 1);
+	glVertex2d(1, 0.4);
+	glVertex2d(0.4, 0.4);
+	glVertex2d(0.3, 0.7);
 	// add lines of code here
 	glEnd();
 }
@@ -211,6 +233,13 @@ void Display8() {
 
 	glColor3f(1, 0.1, 0.1); // red
 	glBegin(GL_POLYGON);
+	glVertex2d(0.5, 0.5);
+	glVertex2d(0.7, 0);
+	glVertex2d(0.5, -0.5);
+	glVertex2d(0, -0.7);
+	glVertex2d(-0.5, -0.5);
+	glVertex2d(0.9, 0.9);
+
 	// add lines of code here
 	glEnd();
 }
