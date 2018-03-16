@@ -126,25 +126,11 @@ void Display4() {
 	double a = 0.3, b = 0.2;
 	double pi = 4 * atan(1.0);
 	double ratia = 0.05;
-	double xmin = 100, xmax = -100;
-	double ymin = 100, ymax = -100;
-	for (double t = -pi + ratia; t < pi; t += ratia) {
-		double x, y;
-		x = 2 * (a * cos(t) + b) * cos(t);
-		xmax = (xmax < x) ? x : xmax;
-		xmin = (xmin > x) ? x : xmin;
-		y = 2 * (a * cos(t) + b) * sin(t);
-		ymax = (ymax < y) ? y : ymax;
-		ymin = (ymin > y) ? y : ymin;
-	}
-	xmax = (fabs(xmax) > fabs(xmin)) ? fabs(xmax) : fabs(xmin);
-	ymax = (fabs(ymax) > fabs(ymin)) ? fabs(ymax) : fabs(ymin);
-
 	glColor3f(1, 0.1, 0.1);
 	glBegin(GL_LINE_STRIP);
 	for (double t = -pi + ratia; t < pi; t += ratia) {
 		double x, y;
-		x = (2 * (a * cos(t) + b) * cos(t)) / (xmax + 0.1);
+		x = (2 * (a * cos(t) + b) * cos(t)); // (xmax + 0.1);
 		y = (2 * (a * cos(t) + b) * sin(t));
 		glVertex2f(x, y);
 	}
@@ -152,8 +138,6 @@ void Display4() {
 }
 
 void Display5() {
-	double xmax, ymax;
-	double xmin, ymin;
 	double pi = 4 * atan(1);
 	double ratia = 0.01;
 	double a = 0.2;
@@ -161,14 +145,9 @@ void Display5() {
 	glColor3f(0.1, 0.1, 0.1);
 	glBegin(GL_LINE_STRIP);
 	for (t = -pi / 2 + ratia; t < -pi / 6; t += ratia) {
-		double x;
-		double y;
-
-		if (t != -pi / 6) {
-			x = (a / (4 * cos(t)*cos(t) - 3));
-			y = ((a*tan(t)) / (4 * cos(t) * cos(t) - 3));
-			glVertex2f(x, y);
-		}
+		double x = (a / (4 * cos(t)*cos(t) - 3));
+		double y = ((a*tan(t)) / (4 * cos(t) * cos(t) - 3));
+		glVertex2f(x, y);
 	}
 	glEnd();
 
@@ -193,7 +172,7 @@ void Display6() {
 	double ratia = 0.05;
 	glColor3f(1, 0.1, 0.1);
 	glBegin(GL_LINE_STRIP);
-	for (double t = -9.5; t < 9.5; t += ratia) {
+	for (double t = -10; t < 10; t += ratia) {
 		double x, y;
 		x = a * t - b * sin(t);
 		y = a - b * cos(t);
