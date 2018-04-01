@@ -1,29 +1,30 @@
-#define _CRT_SECURE_NO_WARNINGS
-
+#include <algorithm>
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
-#include <assert.h>
-#include <float.h>
+#include <cmath>
+#include <vector>
+#include <set>
+#include <cassert>
+#include <iostream>
+#include <list>
+#include <tuple>
+#include <complex>
 
-#include <gl\glut.h>
 
+#include <GL/glut.h>
+using namespace std;
 // dimensiunea ferestrei in pixeli
-#define dim 400
+#define dim 300
 // numarul maxim de iteratii pentru testarea apartenentei la mult.Julia-Fatou
 #define NRITER_JF 5000
 // modulul maxim pentru testarea apartenentei la mult.Julia-Fatou
 #define MODMAX_JF 10000000
-// numarul maxim de iteratii pentru testarea apartenentei la mult.Julia-Fatou
-#define NRITER_MD 10
-// modulul maxim pentru testarea apartenentei la mult.Julia-Fatou
-#define MODMAX_MD 2
 // ratii ptr. CJuliaFatou
 #define RX_JF 0.01
 #define RY_JF 0.01
 
-int nivel = 0;
 unsigned char prevKey;
+int nivel = 0;
 
 class CComplex {
 public:
@@ -146,8 +147,8 @@ public:
 		glPushMatrix();
 		glLoadIdentity();
 
-		//  glTranslated((xmin + xmax) * 1.0 / (xmin - xmax), (ymin + ymax)  * 1.0 / (ymin - ymax), 0);
-		// glScaled(1.0 / (xmax - xmin), 1.0 / (ymax - ymin), 1);
+		//    glTranslated((xmin + xmax) * 1.0 / (xmin - xmax), (ymin + ymax)  * 1.0 / (ymin - ymax), 0);
+		//    glScaled(1.0 / (xmax - xmin), 1.0 / (ymax - ymin), 1);
 		// afisarea propriu-zisa
 		glBegin(GL_POINTS);
 		for (double x = xmin; x <= xmax; x += RX_JF)
@@ -186,33 +187,29 @@ private:
 	} m;
 };
 
+
+
 class CMandelbrot {
 public:
+	int nrIterations = 10;
 	CMandelbrot()
 	{
-		m.nriter = NRITER_MD;
-		m.modmax = MODMAX_MD;
-	}
+		// m.c se initializeaza implicit cu 0+0i
 
+	}
 	~CMandelbrot() {}
 
-	void setmodmax(double v) { assert(v <= MODMAX_MD); m.modmax = v; }
-	double getmodmax() { return m.modmax; }
-
-	void setnriter(int v) { assert(v <= NRITER_MD); m.nriter = v; }
-	int getnriter() { return m.nriter; }
-
-	int isIn(CComplex &x) {
+	int is_in(CComplex c) {
+		CComplex z1, z0;
 		int rez = 0;
-		CComplex z0, z1;
-
-		z0 = CComplex(0, 0);
-		for (int i = 1; i < m.nriter; i++)
+		for (int i = 0; i < nrIterations; ++i)
 		{
-			z1 = z0 * z0 + x;
-			if (z1.getModul() > m.modmax)
-			{
-				rez = -1;
+			z1 = z0 * z0 + c;
+			if (z1.getModul() > 2) {
+				rez = i;
+				break;
+			}
+			if (z1 == z0) {
 				break;
 			}
 			z0 = z1;
@@ -220,43 +217,49 @@ public:
 		return rez;
 	}
 
-	void display(double xmin, double ymin, double xmax, double ymax, bool flag = false)
-	{
+	void display(double xmin, double ymin, double xmax, double ymax) {
 		glPushMatrix();
 		glLoadIdentity();
-
 		glBegin(GL_POINTS);
 		for (double x = xmin; x <= xmax; x += RX_JF)
+		{
 			for (double y = ymin; y <= ymax; y += RY_JF)
 			{
-				CComplex z(x, y);
-				int r = isIn(z);
-				glColor3f(1.0, 0.1, 0.1);
-				if (r == 0)
-				{
-					glVertex3d(x / 2, y / 2, 0);
-				}
-				else if (r == -1) {
-					if (flag) {
-						glColor3f(255, 255, 0);
-						glVertex3d(x / 2, y / 2, 0);
-					}
-				}
-			}
-		fprintf(stdout, "STOP\n");
-		glEnd();
+				CComplex c(x, y);
+				int r = is_in(c);
+				if (r == 0) {
 
+					glColor3f(1.0, 0.1, 0.1);
+
+				}
+				else if (r == 1) {
+					glColor3f(0.0, 0.0, 0.20);
+
+				}
+				else if (r == 2) {
+					glColor3f(0.0, 0.0, 0.40);
+
+				}
+				else if (r >= 3 && r < 5) {
+					glColor3f(0.0, 0.0, 0.60);
+				}
+				else if (r >= 7 && r < 9) {
+					glColor3f(0.0, 0.0, 0.80);
+
+				}
+				else 	glColor3f(0.0, 0.0, 1);
+
+
+
+				glBegin(GL_POINTS);
+				glVertex3d(x / 2, y / 2, 0);
+				glEnd();
+
+			}
+		}
+		fprintf(stdout, "STOP\n");
 		glPopMatrix();
 	}
-
-private:
-	struct SDate {
-		CComplex c;
-		// nr. de iteratii
-		int nriter;
-		// modulul maxim
-		double modmax;
-	} m;
 };
 
 class C2coord
@@ -313,6 +316,13 @@ public:
 		m.y = p.m.y;
 		return *this;
 	}
+	CPunct modif(double x, double y)
+	{
+		double xx = m.x + x;
+		double yy = m.y + y;
+		return CPunct(xx, yy);
+	}
+
 
 	void getxy(double &x, double &y)
 	{
@@ -541,7 +551,52 @@ public:
 			arborePerron(lungime * factordiviziune, nivel - 1, factordiviziune, p1, v);
 		}
 	}
+	void arborePerron2(double lungime,
+		int nivel,
+		double factordiviziune,
+		CPunct p,
+		CVector v)
+	{
+		assert(factordiviziune != 0);
+		CPunct p1, p2;
+		if (nivel == 0)
+		{
+		}
+		else
+		{
+			v.rotatie(-45);
+			v.deseneaza(p, lungime);
+			p1 = v.getDest(p, lungime);
+			arborePerron(lungime * factordiviziune, nivel - 1, factordiviziune, p1, v);
 
+			v.rotatie(90);
+			v.deseneaza(p, lungime);
+			p1 = v.getDest(p, lungime);
+			p2 = p1;
+
+			v.rotatie(10);
+			v.deseneaza(p1, lungime);
+			p1 = v.getDest(p1, lungime);
+			arborePerron(lungime * factordiviziune, nivel - 1, factordiviziune, p1, v);
+
+			p1 = p2;
+			v.rotatie(-55);
+			v.deseneaza(p1, lungime);
+			p1 = v.getDest(p1, lungime);
+			p2 = p1;
+
+			v.rotatie(-90);
+			v.deseneaza(p1, lungime);
+			p1 = v.getDest(p1, lungime);
+			arborePerron(lungime * factordiviziune, nivel - 1, factordiviziune, p1, v);
+
+			p1 = p2;
+			v.rotatie(110);
+			v.deseneaza(p1, lungime);
+			p1 = v.getDest(p1, lungime);
+			arborePerron(lungime * factordiviziune, nivel - 1, factordiviziune, p1, v);
+		}
+	}
 	void afisare(double lungime, int nivel)
 	{
 		CVector v(0.0, 1.0);
@@ -551,7 +606,18 @@ public:
 		p = v.getDest(p, 0.25);
 		arborePerron(lungime, nivel, 0.4, p, v);
 	}
+	void afisare2(double lungime, int nivel)
+	{
+		CVector v(0.0, -1.0);
+		CPunct p(-0.8, 1.6);
+
+		v.deseneaza(p, 0.25);
+		p = v.getDest(p, 0.25);
+		arborePerron2(lungime, nivel, 0.4, p, v);
+	}
 };
+
+
 
 class CCurbaHilbert
 {
@@ -595,187 +661,175 @@ public:
 		curbaHilbert(lungime, nivel, p, v, 1);
 	}
 };
-
-class CSquare
-{
+class Patrat9 {
 public:
-	void afisare(double lungime, int nivel)
+	void patrat(double lungime, int nivel, CPunct &p, CVector v)
 	{
-		CVector v(0.0, 1.0);
-		CPunct p(0, 0);
-
-		double x, y;
-		p.getxy(x, y);
-
-		CPunct p1(x - lungime / 2, y - lungime / 2);
-		CPunct p2(x + lungime / 2, y + lungime / 2);
-
-		v.deseneaza(p1, lungime);
-		v.rotatie(-90);
-		v.deseneaza(p1, lungime);
-		v.rotatie(-90);
-		v.deseneaza(p2, lungime);
-		v.rotatie(-90);
-		v.deseneaza(p2, lungime);
-		v.rotatie(-90);
-
-		patrate(lungime, nivel, p, v);
-	}
-
-private:
-	void patrate(double lungime, int nivel, CPunct &p, CVector v)
-	{
-		double x, y;
-		p.getxy(x, y);
-
-		CPunct p1(x - lungime / 6, y - lungime / 6);
-		CPunct p2(x + lungime / 6, y + lungime / 6);
-
-		v.deseneaza(p1, lungime / 3);
-		v.rotatie(-90);
-		v.deseneaza(p1, lungime / 3);
-		v.rotatie(-90);
-		v.deseneaza(p2, lungime / 3);
-		v.rotatie(-90);
-		v.deseneaza(p2, lungime / 3);
-		v.rotatie(270);
-
-		if (nivel > 0)
+		CPunct p1;
+		if (nivel == 0)
 		{
-			CPunct r0(x - lungime / 3, y - lungime / 3);
-			patrate(lungime / 3, nivel - 1, r0, v);
+			deseneazaPatrat(lungime, v, p);
 
-			CPunct r1(x - lungime / 3, y);
-			patrate(lungime / 3, nivel - 1, r1, v);
+		}
+		else
+		{
+			deseneazaPatrat(lungime, v, p);
 
-			CPunct r2(x - lungime / 3, y + lungime / 3);
-			patrate(lungime / 3, nivel - 1, r2, v);
 
-			CPunct r3(x, y - lungime / 3);
-			patrate(lungime / 3, nivel - 1, r3, v);
+			//    v.print(stderr);
+			//    fprintf(stderr, "\n");
 
-			CPunct r5(x, y + lungime / 3);
-			patrate(lungime / 3, nivel - 1, r5, v);
 
-			CPunct r6(x + lungime / 3, y - lungime / 3);
-			patrate(lungime / 3, nivel - 1, r6, v);
+			CPunct p2 = p.modif(lungime, lungime);
 
-			CPunct r7(x + lungime / 3, y);
-			patrate(lungime / 3, nivel - 1, r7, v);
+			patrat(lungime / 3.0, nivel - 1, p2, v);
 
-			CPunct r8(x + lungime / 3, y + lungime / 3);
-			patrate(lungime / 3, nivel - 1, r8, v);
+			p2 = p.modif(lungime, 0);
+			patrat(lungime / 3.0, nivel - 1, p2, v);
+
+			p2 = p.modif(lungime, -lungime);
+			patrat(lungime / 3.0, nivel - 1, p2, v);
+
+
+			p2 = p.modif(0, -lungime);
+			patrat(lungime / 3.0, nivel - 1, p2, v);
+
+			p2 = p.modif(-lungime, -lungime);
+			patrat(lungime / 3.0, nivel - 1, p2, v);
+
+			p2 = p.modif(-lungime, 0);
+			patrat(lungime / 3.0, nivel - 1, p2, v);
+
+			p2 = p.modif(-lungime, lungime);
+			patrat(lungime / 3.0, nivel - 1, p2, v);
+
+
+			p2 = p.modif(-lungime, lungime);
+			patrat(lungime / 3.0, nivel - 1, p2, v);
+
+			p2 = p.modif(0, lungime);
+			patrat(lungime / 3.0, nivel - 1, p2, v);
+
+
+
+
 		}
 	}
-};
-
-class CTree
-{
-public:
-
-	void afisare(double lungime, int nivel)
+	void deseneazaPatrat(double lungime, CVector v, CPunct p)
 	{
-		CVector v(0.0, -1.0);
-		CPunct p(-0.33, 1);
-		v.deseneaza(p, 0.1);
-		CPunct q(-0.33, 0.9);
-		arbore(lungime, nivel, q, v);
-	}
-private:
-	void arbore(double lungime, int nivel, CPunct &p, CVector v)
-	{
-		v.rotatie(-45);
-		v.deseneaza(p, 4 * lungime);
-
-		// stanga
-		CPunct ps = v.getDest(p, 4 * lungime);
-
-		if (nivel > 0)
-			arbore(lungime / 3, nivel - 1, ps, v);
-
+		CPunct p1 = p.modif(lungime / 2, -lungime / 2);
+		v.deseneaza(p1, lungime);
+		p1 = v.getDest(p1, lungime);
 		v.rotatie(90);
-		v.deseneaza(p, 4 * lungime);
+		v.deseneaza(p1, lungime);
 
-		// dreapta
-		CPunct pd = v.getDest(p, 4 * lungime);
 
-		v.rotatie(10);
-		v.deseneaza(pd, 4 * lungime);
+		p1 = v.getDest(p1, lungime);
+		v.rotatie(90);
+		v.deseneaza(p1, lungime);
 
-		// extrem dreapta
-		CPunct px = v.getDest(pd, 4 * lungime);
-
-		if (nivel > 0)
-			arbore(lungime / 3, nivel - 1, px, v);
-
-		v.rotatie(-55);
-		v.deseneaza(pd, 4 * lungime);
-
-		// jos
-		CPunct pj = v.getDest(pd, 4 * lungime);
-
-		v.rotatie(-90);
-		v.deseneaza(pj, 2 * lungime);
-
-		// V
-		CPunct pv = v.getDest(pj, 2 * lungime);
-
-		if (nivel > 0)
-			arbore(lungime / 3, nivel - 1, pv, v);
-
-		v.rotatie(100);
-		v.deseneaza(pj, 2 * lungime);
-
-		// E
-		CPunct pe = v.getDest(pj, 2 * lungime);
-
-		if (nivel > 0)
-			arbore(lungime / 3, nivel - 1, pe, v);
-
-		v.rotatie(-10);
+		p1 = v.getDest(p1, lungime);
+		v.rotatie(90);
+		v.deseneaza(p1, lungime);
 	}
-};
 
-class CSierpinskiTriangle
-{
-public:
+
+
+
 	void afisare(double lungime, int nivel)
 	{
-		CVector v(0, 1);
-		CPunct p(-0.9, -0.9);
-		sierpinski(lungime, nivel, p, v, false);
+		CVector v1(0.0, 1);
+		CPunct p1(0.0, 0.0);
+		deseneazaPatrat(lungime, v1, p1);
+		patrat(lungime / 3.0, nivel, p1, v1);
 	}
-private:
-	void sierpinski(double lungime, int nivel, CPunct &p, CVector v, bool invers)
+};
+class Imaginea3 {
+public:
+	void desenImaginea3(double lungime, int nivel, CPunct &p, CVector v, int unghi)
 	{
 		if (nivel == 0)
 		{
 			v.deseneaza(p, lungime);
 			p = v.getDest(p, lungime);
 		}
+		else {
+			desenImaginea3(lungime / 2, nivel - 1, p, v, unghi);
+			v.rotatie(unghi);
+			desenImaginea3(lungime / 2, nivel - 1, p, v, -unghi);
+			if (nivel % 2 == 1) {
+				v.rotatie(unghi);
+			}
+			else {
+				v.rotatie(-3 * unghi);
+			}
+			desenImaginea3(lungime / 2, nivel - 1, p, v, unghi);
+		}
+	}
+
+	void afisare(double lungime, int nivel) {
+		CVector v(0.0, -1.0);
+		CPunct p(-0.8, 0.8);
+		int unghi = 60;
+		if (nivel % 2 == 1) {
+			v.rotatie(60);
+			unghi = -unghi;
+		}
+		desenImaginea3(lungime, nivel, p, v, unghi);
+	}
+};
+class CArboreBinar2
+{
+public:
+	void arboreBinar2(double lungime, int nivel, CPunct &p, CVector v)
+	{
+		CPunct p1;
+		CVector v2;
+		if (nivel == 0)
+		{
+			v.deseneaza(p, lungime);
+		}
 		else
 		{
-			if (invers)
-			{
-				v.rotatie(60);
-				sierpinski(lungime / 2, nivel - 1, p, v, false);
-				v.rotatie(-60);
-				sierpinski(lungime / 2, nivel - 1, p, v, true);
-				v.rotatie(-60);
-				sierpinski(lungime / 2, nivel - 1, p, v, false);
-				v.rotatie(60);
-			}
-			else
-			{
-				v.rotatie(-60);
-				sierpinski(lungime / 2, nivel - 1, p, v, true);
-				v.rotatie(60);
-				sierpinski(lungime / 2, nivel - 1, p, v, false);
-				v.rotatie(60);
-				sierpinski(lungime / 2, nivel - 1, p, v, true);
-				v.rotatie(-60);
-			}
+
+			v.rotatie(-45);
+			v.deseneaza(p, lungime);
+			p1 = v.getDest(p, lungime);
+
+			arboreBinar2(lungime * 0.4, nivel - 1, p1, v);
+
+			v.rotatie(90);
+			v.deseneaza(p, lungime);
+			p = v.getDest(p, lungime);
+
+			v.rotatie(10);
+			v.deseneaza(p, lungime);
+			p1 = v.getDest(p, lungime);
+			arboreBinar2(lungime * 0.4, nivel - 1, p1, v);
+
+			v.rotatie(-55);
+			v.deseneaza(p, lungime);
+			p = v.getDest(p, lungime);
+
+			v.rotatie(-90);
+			v.deseneaza(p, lungime * 0.4);
+			p1 = v.getDest(p, lungime * 0.4);
+			arboreBinar2(lungime * 0.4, nivel - 1, p1, v);
+
+			v.rotatie(110);
+			v.deseneaza(p, lungime * 0.4);
+			p1 = v.getDest(p, lungime * 0.4);
+			arboreBinar2(lungime * 0.4, nivel - 1, p1, v);
+
 		}
+	}
+
+	void afisare(double lungime, int nivel)
+	{
+		CVector v(0.0, -1.0);
+		CPunct p(0.0, 1.0);
+
+		arboreBinar2(lungime, nivel, p, v);
 	}
 };
 
@@ -798,28 +852,20 @@ void Display2() {
 	cjf.setnriter(30);
 	cjf.display(-1, -1, 1, 1);
 }
-
-// afisare mandelbrot
 void Display3() {
-	CMandelbrot cm = CMandelbrot();
+	CMandelbrot cjf;
 
-	cm.display(-2, -2, 2, 2);
+	glColor3f(1.0, 0.1, 0.1);
+	cjf.display(-2, -2, 2, 2);
 }
 
-// afisare mandelbrot + clasificare
+// afisare curba lui Koch "fulg de zapada"
 void Display4() {
-	CMandelbrot cm = CMandelbrot();
-
-	cm.display(-2, -2, 2, 2, true);
-}
-
-// curba lui Koch
-void Display5() {
 	CCurbaKoch cck;
 	cck.afisare(sqrt(3.0), nivel);
 
 	char c[3];
-	sprintf(c, "%2d", nivel);
+	sprintf_s(c, "%2d", nivel);
 	glRasterPos2d(-0.98, -0.98);
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
@@ -850,12 +896,12 @@ void Display5() {
 }
 
 // afisare arbore binar
-void Display6() {
+void Display5() {
 	CArboreBinar cab;
 	cab.afisare(1, nivel);
 
 	char c[3];
-	sprintf(c, "%2d", nivel);
+	sprintf_s(c, "%2d", nivel);
 	glRasterPos2d(-0.98, -0.98);
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
@@ -884,11 +930,11 @@ void Display6() {
 }
 
 // afisare arborele lui Perron
-void Display7() {
+void Display6() {
 	CArborePerron cap;
 
 	char c[3];
-	sprintf(c, "%2d", nivel);
+	sprintf_s(c, "%2d", nivel);
 	glRasterPos2d(-0.98, -0.98);
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
@@ -924,12 +970,12 @@ void Display7() {
 }
 
 // afisare curba lui Hilbert
-void Display8() {
+void Display7() {
 	CCurbaHilbert cch;
 	cch.afisare(0.05, nivel);
 
 	char c[3];
-	sprintf(c, "%2d", nivel);
+	sprintf_s(c, "%2d", nivel);
 	glRasterPos2d(-0.98, -0.98);
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
@@ -940,7 +986,7 @@ void Display8() {
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[0]);
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[1]);
 
-	glRasterPos2d(-1.0, 0.9);
+	glRasterPos2d(-1.0, -0.9);
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'c');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'u');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
@@ -958,69 +1004,13 @@ void Display8() {
 	nivel++;
 }
 
-// afisare square
-void Display9() {
-	CSquare cSquare;
-	cSquare.afisare(1.6, nivel);
-
-	char c[3];
-	sprintf(c, "%2d", nivel);
-	glRasterPos2d(-0.98, -0.98);
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'v');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'l');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, '=');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[0]);
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[1]);
-
-	glRasterPos2d(-1.0, 0.9);
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'P');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 't');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 't');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
-
-	nivel++;
-}
-
-// afisare tree
-void Display10() {
-	CTree cTree;
-	cTree.afisare(0.1, nivel);
-
-	char c[3];
-	sprintf(c, "%2d", nivel);
-	glRasterPos2d(-0.98, -0.98);
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'v');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'l');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, '=');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[0]);
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[1]);
-
-	glRasterPos2d(-1.0, 0.9);
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'T');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
-
-	nivel++;
-}
-
-// Sierpinski triangle
-void Display11()
+void Display8()
 {
-	CSierpinskiTriangle cSierpinskiTriangle;
-	cSierpinskiTriangle.afisare(1.8, nivel);
-
+	Patrat9 pat;
+	glColor3f(1.0, 0.1, 0.1);
+	pat.afisare(1.6, nivel);
 	char c[3];
-	sprintf(c, "%2d", nivel);
+	sprintf_s(c, "%2d", nivel);
 	glRasterPos2d(-0.98, -0.98);
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
@@ -1031,32 +1021,84 @@ void Display11()
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[0]);
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[1]);
 
-	glRasterPos2d(-1, 0.9);
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'S');
+	nivel++;
+}
+void Display9()
+{
+	CArborePerron cap;
+
+	char c[3];
+	sprintf_s(c, "%2d", nivel);
+	glRasterPos2d(-0.98, -0.98);
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'v');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'p');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'n');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 's');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'k');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, ' ');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'T');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'n');
-	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'g');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'l');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, '=');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[0]);
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[1]);
+
+	glRasterPos2d(-1.0, -0.9);
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'a');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'b');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'o');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
 	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, ' ');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'P');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'r');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'o');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'n');
+
+	glPushMatrix();
+	glLoadIdentity();
+	glScaled(0.4, 0.4, 1);
+	glTranslated(0.5, 0.5, 0.0);
+	cap.afisare2(1, nivel);
+	glPopMatrix();
+	nivel++;
+}
+void Display0()
+{
+	Imaginea3 img3;
+	img3.afisare(1.6, nivel);
+	char c[3];
+	sprintf_s(c, "%2d", nivel);
+	glRasterPos2d(-0.98, -0.98);
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'N');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'i');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'v');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'e');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, 'l');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, '=');
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[0]);
+	glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c[1]);
 
 	nivel++;
+}
+
+void Init(void) {
+
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+
+	glLineWidth(1);
+
+	//   glPointSize(3);
+
+	glPolygonMode(GL_FRONT, GL_LINE);
 }
 
 void Display(void) {
 	switch (prevKey) {
+	case 'm':
+		glClear(GL_COLOR_BUFFER_BIT);
+		nivel = 0;
+		fprintf(stderr, "nivel = %d\n", nivel);
+		break;
 	case '1':
 		glClear(GL_COLOR_BUFFER_BIT);
 		Display1();
@@ -1095,11 +1137,7 @@ void Display(void) {
 		break;
 	case '0':
 		glClear(GL_COLOR_BUFFER_BIT);
-		Display10();
-		break;
-	case '-':
-		glClear(GL_COLOR_BUFFER_BIT);
-		Display11();
+		Display0();
 		break;
 	default:
 		break;
@@ -1108,25 +1146,11 @@ void Display(void) {
 	glFlush();
 }
 
-void Init(void) {
-
-	glClearColor(1.0, 1.0, 1.0, 1.0);
-
-	glLineWidth(1);
-
-	//   glPointSize(3);
-
-	glPolygonMode(GL_FRONT, GL_LINE);
-}
-
 void Reshape(int w, int h) {
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
 
 void KeyboardFunc(unsigned char key, int x, int y) {
-	if (prevKey != key) {
-		nivel = 0;
-	}
 	prevKey = key;
 	if (key == 27) // escape
 		exit(0);
@@ -1162,3 +1186,5 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
+
+
