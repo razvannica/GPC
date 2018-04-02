@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <float.h>
 
-#include <gl\glut.h>
+#include <gl/glut.h>
 
 // dimensiunea ferestrei in pixeli
 #define dim 400
