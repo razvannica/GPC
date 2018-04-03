@@ -42,6 +42,8 @@ private:
 	float x_ratio, y_ratio;
 	int size;
 	Point top, bottom;
+	const float RAD_DEG = 57.296;
+
 public:
 	Grill(int size){
 		bottom.setX(-0.8);
@@ -102,7 +104,6 @@ public:
 		glColor3f(0.1, 0.1, 0.1);
 		glLineWidth(1);
 		glBegin(GL_LINES);
-	//	fprintf(stdout, "%f	%f\n",x_ratio, y_ratio);
 		for (float x = bottom.getX(); x <= top.getX(); x += x_ratio) {
 			glVertex2f(x, bottom.getY());
 			glVertex2f(x, top.getY());
@@ -120,31 +121,46 @@ public:
 		glEnd();
 	}
 
-	void writePixel(float x, float y, int nivel) {
+	void drawCircle(float x, float y, float radius) {
+		glBegin(GL_TRIANGLE_FAN);
+
+		if (x >= bottom.getX() && x <= top.getX() &&
+			y >= bottom.getY() && y <= top.getY()) {
+			glVertex2f(x, y);
+			for (int i = 0; i <= 20; i++) {
+				float cx = x + (radius * cos(i * 2 * PI / 20));
+				float cy = y + (radius * sin(i * 2 * PI / 20));
+				glVertex2f(cx, cy);
+			}
+			glEnd();
+		}
+	}
+
+	void writePixel(float x, float y, int level) {
 		glPointSize(5);
 		x = x * x_ratio + bottom.getX();
 		y = y * y_ratio + bottom.getY();
-		float raza = 0;
-		glColor3f(0,0,1);
+		float radius = 0;
+		glColor3f(0.1,0.1,0.1);
 		glBegin(GL_POINTS);
 		glVertex2f(x, y);
 		glEnd();
-/*		if (ratiax <= ratiay)
-			raza = ratiax * 0.4;
+
+		if (x_ratio <= y_ratio)
+			radius = x_ratio * 0.4;
 		else
-			raza = ratiay * 0.4;
+			radius = y_ratio * 0.4;
 
-		drawFilledCircle(x, y, raza);
-		for (int i = 1; i <= nivel; i++) {
-
-			drawFilledCircle(x - i * ratiax, y, raza);
-			drawFilledCircle(x + i * ratiax, y, raza);
-			drawFilledCircle(x, y + i * ratiay, raza);
-			drawFilledCircle(x, y - i * ratiay, raza);
-		}*/
+		drawCircle(x, y, radius);
+		for (int i = 1; i <= level; i++) {
+			drawCircle(x - i * x_ratio, y, radius);
+			drawCircle(x + i * x_ratio, y, radius);
+			drawCircle(x, y + i * y_ratio, radius);
+			drawCircle(x, y - i * y_ratio, radius);
+		}
 	}
 
-	void plotLineLow(float x0, float y0, float x1, float y1, int nivel) {
+	void plotLineLow(float x0, float y0, float x1, float y1, int level) {
 		float dx = x1 - x0;
 		float dy = y1 - y0;
 		float yi = 1;
@@ -156,7 +172,7 @@ public:
 		float y = y0;
 
 		for (float x = x0; x <= x1; x += 1) {
-			writePixel(x, y, nivel);
+			writePixel(x, y, level);
 			if (D > 0) {
 				y = y + yi;
 				D = D - 2 * dx;
@@ -165,7 +181,7 @@ public:
 		}
 	}
 
-	void plotLineHigh(float x0, float y0, float x1, float y1, int nivel) {
+	void plotLineHigh(float x0, float y0, float x1, float y1, int level) {
 		float dx = x1 - x0;
 		float dy = y1 - y0;
 		float xi = 1;
@@ -177,7 +193,7 @@ public:
 		float x = x0;
 
 		for (float y = y0; y <= y1; y += 1) {
-			writePixel(x, y, nivel);
+			writePixel(x, y, level);
 			if (D > 0) {
 				x = x + xi;
 				D = D - 2 * dy;
@@ -186,7 +202,7 @@ public:
 		}
 	}
 
-	void plotLine(Point p0, Point p1) {
+	void plotLine(Point p0, Point p1, int level) {
 		glColor3f(1, 0.1, 0.1);
 		glLineWidth(3);
 		glBegin(GL_LINES);
@@ -205,15 +221,15 @@ public:
 
 		if (fabs(y1 - y0) < fabs(x1 - x0)) {
 			if (x0 > x1)
-				plotLineLow(x1, y1, x0, y0, 0);
+				plotLineLow(x1, y1, x0, y0, level);
 			else
-				plotLineLow(x0, y0, x1, y1, 0);
+				plotLineLow(x0, y0, x1, y1, level);
 		}
 		else {
 			if (y0 > y1)
-				plotLineHigh(x1, y1, x0, y0, 0);
+				plotLineHigh(x1, y1, x0, y0, level);
 			else
-				plotLineHigh(x0, y0, x1, y1, 0);
+				plotLineHigh(x0, y0, x1, y1, level);
 		}
 	}
 };
@@ -244,13 +260,13 @@ void Display(void)
 	p1.setY(15);
 	p2.setX(15);
 	p2.setY(10);
-	G.plotLine(p1, p2);
+	G.plotLine(p1, p2, 1);
 
 	p3.setX(0);
 	p3.setY(0);
 	p4.setX(15);
 	p4.setY(7);
-	G.plotLine(p3, p4);
+	G.plotLine(p3, p4, 0);
 
 	glFlush();
 }
