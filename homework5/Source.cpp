@@ -233,18 +233,18 @@ public:
 
 				}
 				else if (r == 1) {
-					glColor3f(0.0, 0.0, 0.20);
+					glColor3f(1.0, 0.5, 0.0);
 
 				}
 				else if (r == 2) {
-					glColor3f(0.0, 0.0, 0.40);
+					glColor3f(0.5, 1.0, 0.0);
 
 				}
 				else if (r >= 3 && r < 5) {
-					glColor3f(0.0, 0.0, 0.60);
+					glColor3f(0.0, 1.0, 1.0);
 				}
 				else if (r >= 7 && r < 9) {
-					glColor3f(0.0, 0.0, 0.80);
+					glColor3f(1.0, 0.0, 1.0);
 
 				}
 				else 	glColor3f(0.0, 0.0, 1);
@@ -1186,5 +1186,6 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
+
 
 
